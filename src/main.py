@@ -19,27 +19,46 @@ def main() -> None:
     songs = load_songs("data/songs.csv")
     print(f"Loaded songs: {len(songs)}")
 
-    # Starter example profile
-    user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}
+    profiles = [
+        {
+            "name": "High-Energy Pop",
+            "prefs": {"genre": "pop", "mood": "happy", "energy": 0.9},
+        },
+        {
+            "name": "Chill Lofi",
+            "prefs": {"genre": "lofi", "mood": "chill", "energy": 0.35},
+        },
+        {
+            "name": "Deep Intense Rock",
+            "prefs": {"genre": "rock", "mood": "intense", "energy": 0.95},
+        },
+        {
+            "name": "Edge Case: High Energy + Sad Mood",
+            "prefs": {"genre": "pop", "mood": "sad", "energy": 0.9},
+        },
+        {
+            "name": "Edge Case: Low Energy + Intense Mood",
+            "prefs": {"genre": "ambient", "mood": "intense", "energy": 0.15},
+        },
+    ]
 
-    recommendations = recommend_songs(user_prefs, songs, k=5)
+    for profile in profiles:
+        print(f"\n=== {profile['name']} ===")
+        recommendations = recommend_songs(profile["prefs"], songs, k=5)
 
-    print("\nTop recommendations:\n")
-    for rec in recommendations:
-        # You decide the structure of each returned item.
-        # A common pattern is: (song, score, explanation)
-        song, score, explanation = rec
-        reasons = [reason.strip() for reason in explanation.split(",") if reason.strip()]
+        for index, rec in enumerate(recommendations, start=1):
+            song, score, explanation = rec
+            reasons = [reason.strip() for reason in explanation.split(",") if reason.strip()]
 
-        print("---")
-        print(f"Title: {song['title']}")
-        print(f"Artist: {song['artist']}")
-        print(f"Final Score: {score:.2f}")
-        print("Reasons:")
-        for reason in reasons:
-            print(f"- {reason}")
-        print("---")
-        print()
+            print(f"\n--- Recommendation {index} ---")
+            print(f"Title: {song['title']}")
+            print(f"Artist: {song['artist']}")
+            print(f"Final Score: {score:.2f}")
+            print("Reasons:")
+            for reason in reasons:
+                print(f"- {reason}")
+            print("---")
+            print()
 
 
 if __name__ == "__main__":

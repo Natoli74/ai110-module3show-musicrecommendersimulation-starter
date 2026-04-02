@@ -39,7 +39,7 @@ The final scoring system gives points for both exact matches and close numeric m
 - Exact mood match: `+4`
 - Energy similarity: `+5 * max(0, 1 - abs(target_energy - song_energy))`
 - Tempo similarity: `+2 * max(0, 1 - abs(target_tempo_bpm - song_tempo_bpm) / 200)`
-- Valence similarity: `+2 * max(0, 1 - abs(target_valence - song_valence))`
+- Valence similarity: `+2 * amax(0, 1 - abs(target_valence - song_valence))`
 - Acousticness similarity: `+1 * max(0, 1 - abs(target_acousticness - song_acousticness))`
 
 This keeps mood and energy more important than genre, which helps the system recommend songs by vibe instead of only by category.
