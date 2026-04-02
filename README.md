@@ -26,14 +26,11 @@ In real music platforms, recommendations usually blend collaborative filtering, 
 
 The final scoring system gives points for both exact matches and close numeric matches:
 
-- Exact genre match: `+3`
-- Exact mood match: `+4`
-- Energy similarity: `+5 * max(0, 1 - abs(target_energy - song_energy))`
-- Tempo similarity: `+2 * max(0, 1 - abs(target_tempo_bpm - song_tempo_bpm) / 200)`
-- Valence similarity: `+2 * amax(0, 1 - abs(target_valence - song_valence))`
-- Acousticness similarity: `+1 * max(0, 1 - abs(target_acousticness - song_acousticness))`
+- Exact genre match: `+1.0`
+- Exact mood match: `+1.0`
+- Energy similarity: `+2.0 * (1 - abs(target_energy - song_energy))`
 
-This keeps mood and energy more important than genre, which helps the system recommend songs by vibe instead of only by category.
+This keeps energy as the strongest signal and uses genre and mood as supporting signals, which helps the system recommend songs by vibe instead of only by category.
 
 One potential bias is that if genre points are too high, the recommender may over-prioritize genre and miss songs that match the user's mood or energy better. Another risk is that the model can favor high-energy tracks if those weights are dominant, so the balance between categorical and numeric features needs to stay intentional.
 
@@ -52,10 +49,9 @@ One potential bias is that if genre points are too high, the recommender may ove
 
 **UserProfile attributes used in the recommender**
 
-- `favorite_genre`
-- `favorite_mood`
-- `target_energy`
-- `likes_acoustic`
+- `genre`
+- `mood`
+- `energy`
 
 ## Screenshots
 
@@ -164,9 +160,7 @@ Read and complete `model_card.md`:
 
 [**Model Card**](model_card.md)
 
-Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+This project demonstrated that recommendation "intelligence" is essentially the mathematical weighting of human intent. By prioritizing Energy (+5) over Genre (+3), I programmed the system to value a song's "vibe" over its category. This shift showed how even simple content-based filtering can feel intuitive when using features like valence and acousticness to match a user's context rather than just their library history.However, the "adversarial" tests revealed the mechanical limits of this logic. Because high-energy scores could mathematically overwhelm mood matches, the system occasionally suggested upbeat tracks to "Sad" profiles. This highlighted a key algorithmic bias: without careful tuning, numerical similarity can override emotional nuance. Real-world systems must balance these weights to avoid "filter bubbles" where a single dominant feature dictates every suggestion.
+This project demonstrated that recommendation "intelligence" is essentially the mathematical weighting of human intent. By prioritizing energy similarity (up to +2.0) over individual category matches (+1.0 genre and +1.0 mood), I programmed the system to value a song's vibe over its label alone. This shift showed how even simple content-based filtering can feel intuitive when it focuses on closeness to user intent rather than only exact category matches. However, the adversarial tests revealed the mechanical limits of this logic. Because strong energy similarity can still outweigh missing mood alignment, the system can suggest upbeat tracks to a "Sad" profile. This highlighted a key algorithmic bias: without careful tuning, numerical similarity can override emotional nuance.
 
 ---
