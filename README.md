@@ -29,6 +29,28 @@ Some prompts to answer:
 
 You can include a simple diagram or bullet list if helpful.
 
+In real music platforms, recommendations usually blend collaborative filtering, which learns from many users' listening patterns, with content-based filtering, which compares item attributes like mood and energy. My version will prioritize content-based features so it can recommend songs that match a user's current vibe even when there is little or no listening history. The recommender will score each song by comparing its attributes to the user profile, then rank the highest-scoring songs first.
+
+**Song attributes used from `data/songs.csv`**
+
+- `id`
+- `title`
+- `artist`
+- `genre`
+- `mood`
+- `energy`
+- `tempo_bpm`
+- `valence`
+- `danceability`
+- `acousticness`
+
+**UserProfile attributes used in the recommender**
+
+- `favorite_genre`
+- `favorite_mood`
+- `target_energy`
+- `likes_acoustic`
+
 ---
 
 ## Getting Started
