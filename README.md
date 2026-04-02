@@ -31,6 +31,21 @@ You can include a simple diagram or bullet list if helpful.
 
 In real music platforms, recommendations usually blend collaborative filtering, which learns from many users' listening patterns, with content-based filtering, which compares item attributes like mood and energy. My version will prioritize content-based features so it can recommend songs that match a user's current vibe even when there is little or no listening history. The recommender will score each song by comparing its attributes to the user profile, then rank the highest-scoring songs first.
 
+## Algorithm Recipe
+
+The final scoring system gives points for both exact matches and close numeric matches:
+
+- Exact genre match: `+3`
+- Exact mood match: `+4`
+- Energy similarity: `+5 * max(0, 1 - abs(target_energy - song_energy))`
+- Tempo similarity: `+2 * max(0, 1 - abs(target_tempo_bpm - song_tempo_bpm) / 200)`
+- Valence similarity: `+2 * max(0, 1 - abs(target_valence - song_valence))`
+- Acousticness similarity: `+1 * max(0, 1 - abs(target_acousticness - song_acousticness))`
+
+This keeps mood and energy more important than genre, which helps the system recommend songs by vibe instead of only by category.
+
+One potential bias is that if genre points are too high, the recommender may over-prioritize genre and miss songs that match the user's mood or energy better. Another risk is that the model can favor high-energy tracks if those weights are dominant, so the balance between categorical and numeric features needs to stay intentional.
+
 **Song attributes used from `data/songs.csv`**
 
 - `id`
@@ -63,6 +78,8 @@ In real music platforms, recommendations usually blend collaborative filtering, 
    python -m venv .venv
    source .venv/bin/activate      # Mac or Linux
    .venv\Scripts\activate         # Windows
+
+   ```
 
 2. Install dependencies
 
@@ -123,12 +140,11 @@ Write 1 to 2 paragraphs here about what you learned:
 - about how recommenders turn data into predictions
 - about where bias or unfairness could show up in systems like this
 
-
 ---
 
 ## 7. `model_card_template.md`
 
-Combines reflection and model card framing from the Module 3 guidance. :contentReference[oaicite:2]{index=2}  
+Combines reflection and model card framing from the Module 3 guidance. :contentReference[oaicite:2]{index=2}
 
 ```markdown
 # 🎧 Model Card - Music Recommender Simulation
@@ -180,6 +196,7 @@ Describe your dataset.
 Where does your recommender work well
 
 You can think about:
+
 - Situations where the top results "felt right"
 - Particular user profiles it served well
 - Simplicity or transparency benefits
@@ -191,6 +208,7 @@ You can think about:
 Where does your recommender struggle
 
 Some prompts:
+
 - Does it ignore some genres or moods
 - Does it treat all users as if they have the same taste shape
 - Is it biased toward high energy or one genre by default
@@ -203,6 +221,7 @@ Some prompts:
 How did you check your system
 
 Examples:
+
 - You tried multiple user profiles and wrote down whether the results matched your expectations
 - You compared your simulation to what a real app like Spotify or YouTube tends to recommend
 - You wrote tests for your scoring logic
@@ -230,4 +249,4 @@ A few sentences about what you learned:
 - What surprised you about how your system behaved
 - How did building this change how you think about real music recommenders
 - Where do you think human judgment still matters, even if the model seems "smart"
-
+```
