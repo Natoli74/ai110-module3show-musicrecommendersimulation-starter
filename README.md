@@ -138,6 +138,8 @@ Use this section to document the experiments you ran. For example:
 - What happened when you added tempo or valence to the score
 - How did your system behave for different types of users
 
+Note: I also completed Optional Extension Challenge 3 by adding a diversity penalty that reduces repeated artists or genres in the top recommendations.
+
 ---
 
 ## Limitations and Risks

@@ -117,15 +117,63 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
 
 def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
     """Return the top-k songs ranked by recommendation score."""
-    scored_songs: List[Tuple[Dict, float, str]] = []
+    # Diversity penalties discourage repeated artists/genres in top results.
+    artist_penalty_weight = 0.35
+    genre_penalty_weight = 0.20
 
+    candidates: List[Dict] = []
     for song in songs:
-        total_score, reasons = score_song(user_prefs, song)
-        explanation = ", ".join(reasons)
-        scored_songs.append((song, total_score, explanation))
+        base_score, reasons = score_song(user_prefs, song)
+        candidates.append(
+            {
+                "song": song,
+                "base_score": base_score,
+                "base_reasons": reasons,
+            }
+        )
 
-    # Use a non-mutating sort to preserve the input song order/list for callers.
-    ranked_songs = sorted(scored_songs, key=lambda item: item[1], reverse=True)
+    selected: List[Tuple[Dict, float, str]] = []
+    selected_artist_counts: Dict[str, int] = {}
+    selected_genre_counts: Dict[str, int] = {}
 
-    top_k = max(0, k)
-    return ranked_songs[:top_k]
+    top_k = max(0, min(k, len(candidates)))
+
+    for _ in range(top_k):
+        best_index = -1
+        best_adjusted_score = float("-inf")
+        best_penalty = 0.0
+
+        for index, candidate in enumerate(candidates):
+            song = candidate["song"]
+            artist = str(song.get("artist", "")).strip().lower()
+            genre = str(song.get("genre", "")).strip().lower()
+
+            artist_repeat_count = selected_artist_counts.get(artist, 0)
+            genre_repeat_count = selected_genre_counts.get(genre, 0)
+
+            penalty = (
+                artist_repeat_count * artist_penalty_weight
+                + genre_repeat_count * genre_penalty_weight
+            )
+            adjusted_score = candidate["base_score"] - penalty
+
+            if adjusted_score > best_adjusted_score:
+                best_adjusted_score = adjusted_score
+                best_index = index
+                best_penalty = penalty
+
+        chosen = candidates.pop(best_index)
+        chosen_song = chosen["song"]
+        chosen_reasons = list(chosen["base_reasons"])
+
+        if best_penalty > 0:
+            chosen_reasons.append(f"diversity penalty (-{best_penalty:.2f})")
+
+        selected.append((chosen_song, best_adjusted_score, ", ".join(chosen_reasons)))
+
+        chosen_artist = str(chosen_song.get("artist", "")).strip().lower()
+        chosen_genre = str(chosen_song.get("genre", "")).strip().lower()
+        selected_artist_counts[chosen_artist] = selected_artist_counts.get(chosen_artist, 0) + 1
+        selected_genre_counts[chosen_genre] = selected_genre_counts.get(chosen_genre, 0) + 1
+
+    return selected
